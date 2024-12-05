@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zkharbac <zkharbac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/02 16:58:31 by zkharbac          #+#    #+#             */
-/*   Updated: 2024/12/04 11:50:18 by zkharbac         ###   ########.fr       */
+/*   Created: 2024/12/04 18:58:02 by zkharbac          #+#    #+#             */
+/*   Updated: 2024/12/05 09:28:07 by zkharbac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static char *append_read(char **str, int fd)
 {
@@ -82,37 +82,31 @@ static char *rest_func(char *reminder)
 
 char *get_next_line(int fd)
 {
-    static char *reminder = NULL;
+    static char *reminder [OPEN_MAX];
     char *line;
 
     if (fd < 0 || BUFFER_SIZE <= 0)
         return NULL;
 
-    reminder = append_read(&reminder, fd);
+    reminder[fd] = append_read(&reminder[fd], fd);
     if (!reminder)
         return NULL;
-
-    line = get_line(reminder);
-    reminder = rest_func(reminder);
+    line = get_line(reminder[fd]);
+    if(!line)
+    {
+		free(reminder[fd]);
+		reminder[fd] = NULL;
+		return (NULL);
+	}
+    reminder[fd]= rest_func(reminder[fd]);
     return line;
 }
 
-// int main()
-// {
-//     int fd = open("test.txt", O_RDONLY);
-//     if (fd < 0)
-//     {
-//         perror("Error opening file");
-//         return 1;
-//     }
+int main()
+{
+   int fd1 = open("file1.txt", O_RDONLY);
+int fd2 = open("file2.txt", O_RDONLY);
+printf("File1: %s", get_next_line(fd1));
+printf("File2: %s", get_next_line(fd2));
 
-//     char *line;
-//     line = get_next_line(fd); 
-//     line = get_next_line(fd); 
-//      printf("%s",line);
-// 	free(line);
-    
-  
-    
-//     return 0;
-// }
+}
